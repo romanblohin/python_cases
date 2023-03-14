@@ -1,4 +1,4 @@
-guests = ['Egor Krid', 'Mask', 'Baiden', 'Enshtein', 'Putin', 'Shoigu']
+guests = ['Egor Krid', 'Mask', 'Erdogan', 'Enshtein', 'Trump', 'Loza']
 
 print('Вынуждены с сожалением сообщить, что на обед приглашены всего два гостя')
 

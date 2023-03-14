@@ -1,4 +1,4 @@
-guests = ['Mask', 'Enshtein', 'Putin']
+guests = ['Mask', 'Enshtein', 'Trump']
 
 couldnt_come = guests[1]
 guests[1] = "Kirkorov"

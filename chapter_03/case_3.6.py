@@ -1,8 +1,8 @@
-guests = ['Mask', 'Enshtein', 'Putin']
+guests = ['Mask', 'Enshtein', 'Trump']
 
 guests.insert(0, 'Egor Krid')
-guests.insert(2, 'Baiden')
-guests.append('Shoigu')
+guests.insert(2, 'Loza')
+guests.append('Erdogan')
 
 print(f'Dear Mr. {guests[0]}, I wish to invite you to a dinner')
 print(f'Dear Mr. {guests[1]}, I wish to invite you to a dinner')
