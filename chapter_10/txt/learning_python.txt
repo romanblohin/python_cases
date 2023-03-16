@@ -1,0 +1,4 @@
+In Python you can print messages
+In Python you can read files
+In Python you can creating bots
+In Python you can scraping websites

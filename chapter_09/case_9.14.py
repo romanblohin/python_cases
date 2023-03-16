@@ -9,10 +9,8 @@ for i in range(10):
 
 lucky_ticket = ""
 
-for i in range(4):
-	lucky_ticket += str(choice(number_letter_list)) + " "
-
 print(number_letter_list)
+print("Выигрывает билет под номером", end=' ')
 
-print(f"Выигрывает билет под номером {lucky_ticket}")
-
+for i in range(4):
+	print(choice(number_letter_list), end=' ')
