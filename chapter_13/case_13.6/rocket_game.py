@@ -1,9 +1,11 @@
 import sys
+from time import sleep
 
 import pygame
 
 from rocket import Rocket
 from settings import Settings
+from game_stats import GameStats
 from bullet import Bullet
 from spaceship import Spaceship
 
@@ -20,11 +22,41 @@ class RocketGame:
         self.screen_rect = self.screen.get_rect()
         pygame.display.set_caption("Rocket Game")
 
+        # Создание экземпляра для хранения игровой статистики.
+        self.stats = GameStats(self)
+
         self.rocket = Rocket(self)
         self.bullets = pygame.sprite.Group()
         self.spaceships = pygame.sprite.Group()
 
         self._create_fleet()
+
+    def _rocket_hit(self):
+        """Respond to the rocket being hit by an spaceship."""
+        if self.stats.rockets_left > 1:
+            # Decrement rockets_left.
+            self.stats.rockets_left -= 1
+            
+            # Get rid of any remaining spaceships and bullets.
+            self.spaceships.empty()
+            self.bullets.empty()
+            
+            # Create a new fleet and center the rocket.
+            self._create_fleet()
+            self.rocket.center_rocket()
+            
+            # Pause.
+            sleep(0.5)
+        else:
+            self.stats.game_active = False
+
+    def _check_spaceships_left(self):
+        """Проверяет, добрались ли космические корабли до левого края экрана."""
+        for spaceship in self.spaceships.sprites():
+            if spaceship.rect.left <= 0:
+                # Происходит то же, что при столкновении с кораблем.
+                self._rocket_hit()
+                break
 
     def _create_fleet(self): 
         """Создание флота вторжения."""
@@ -76,9 +108,12 @@ class RocketGame:
         while True:
 
             self._check_events()
-            self.rocket.update()
-            self._update_bullets()
-            self._update_spaceships()
+
+            if self.stats.game_active:
+                self.rocket.update()
+                self._update_bullets()
+                self._update_spaceships()
+            
             self._update_screen()
 
     def _update_bullets(self):
@@ -101,6 +136,9 @@ class RocketGame:
         # При обнаружении попадания удалить снаряд и корабль.
         collisions = pygame.sprite.groupcollide(
                 self.bullets, self.spaceships, True, True)
+        if collisions:
+            self.stats.spaceships_killed += 1
+            print(self.stats.spaceships_killed)
 
         if not self.spaceships:
             # Уничтожение существующих снарядов и создание нового флота.
@@ -112,6 +150,13 @@ class RocketGame:
         """Обновляет позиции всех пришельцев во флоте."""
         self._check_fleet_edges() 
         self.spaceships.update()
+
+        # Проверка коллизий "пришелец — корабль".
+        if pygame.sprite.spritecollideany(self.rocket, self.spaceships):
+            self._rocket_hit()
+
+        # Проверить, добрались ли пришельцы до нижнего края экрана.
+        self._check_spaceships_left()
             
     def _check_events(self):
         # Watch for keyboard and mouse events.
