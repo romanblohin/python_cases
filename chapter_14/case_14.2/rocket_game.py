@@ -27,10 +27,17 @@ class RocketGame:
 
         self.rocket = Rocket(self)
         self.bullets = pygame.sprite.Group()
-        self.ship = Ship(self)
+        self.ships = pygame.sprite.Group()
 
+        self._create_ship()
+        
         # Создание кнопки Play.
         self.play_button = Button(self, "Play")
+
+    def _create_ship(self): 
+        """Создание корабля."""
+        ship = Ship(self)
+        self.ships.add(ship)
 
     def run_game(self):
         """Start the main loop for the game."""
@@ -55,8 +62,7 @@ class RocketGame:
             if bullet.rect.left >= self.screen_rect.right:
                 self.bullets.remove(bullet)
                 self.stats.missed_bullets += 1
-                print(self.stats.missed_bullets)
-
+                
         self._check_bullet_ship_collisions()
 
     def _check_bullet_ship_collisions(self):
@@ -65,7 +71,8 @@ class RocketGame:
 
         # Проверка попаданий в корабль.
         # При обнаружении попадания удалить снаряд.
-        collisions = pygame.sprite.spritecollideany(self.ship, self.bullets)
+        collisions = pygame.sprite.groupcollide(
+                self.bullets, self.ships, True, False)
 
         if self.stats.missed_bullets >= self.settings.bullets_allowed:
             self.stats.game_active = False
@@ -73,10 +80,10 @@ class RocketGame:
     def _update_ship(self): 
         """Обновляет позицию корабля, делает проверку достиг ли корабль края экрана
            При достижении края экрана корабль меняет направление движения"""
-        if self.ship.check_edges():
-            self.settings.fleet_direction *= -1
-
-        self.ship.update()
+        for ship in self.ships:
+            if ship.check_edges():
+                self.settings.fleet_direction *= -1
+            ship.update()
 
     def _check_events(self):
         # Watch for keyboard and mouse events.
@@ -108,7 +115,7 @@ class RocketGame:
 
         # Создание размещение ракеты и корабля в центре.
         self.rocket.center_rocket()
-        self.ship.center_ship()
+        [ship.center_ship() for ship in self.ships]
 
         # Указатель мыши скрывается.
         pygame.mouse.set_visible(False)
@@ -146,7 +153,7 @@ class RocketGame:
         for bullet in self.bullets.sprites(): 
             bullet.draw_bullet()
 
-        self.ship.draw_ship()
+        [ship.draw_ship() for ship in self.ships]
 
         # Кнопка Play отображается в том случае, если игра неактивна.
         if not self.stats.game_active:
